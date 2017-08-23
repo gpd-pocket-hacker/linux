@@ -109,10 +109,10 @@ static int dw_i2c_acpi_configure(struct platform_device *pdev)
 	 * selected speed modes.
 	 */
 	dw_i2c_acpi_params(pdev, "SSCN", &dev->ss_hcnt, &dev->ss_lcnt, &ss_ht);
-	dw_i2c_acpi_params(pdev, "FPCN", &dev->fp_hcnt, &dev->fp_lcnt, &fp_ht);
-	dw_i2c_acpi_params(pdev, "HSCN", &dev->hs_hcnt, &dev->hs_lcnt, &hs_ht);
-	dw_i2c_acpi_params(pdev, "FMCN", &dev->fs_hcnt, &dev->fs_lcnt, &fs_ht);
-
+	//dw_i2c_acpi_params(pdev, "FPCN", &dev->fp_hcnt, &dev->fp_lcnt, &fp_ht);
+	//dw_i2c_acpi_params(pdev, "HSCN", &dev->hs_hcnt, &dev->hs_lcnt, &hs_ht);
+	dw_i2c_acpi_params(pdev, "FMCN", &dev->fs_hcnt, &dev->fs_lcnt, &dev->sda_hold_time);
+/*
 	switch (dev->clk_freq) {
 	case 100000:
 		dev->sda_hold_time = ss_ht;
@@ -128,7 +128,8 @@ static int dw_i2c_acpi_configure(struct platform_device *pdev)
 		dev->sda_hold_time = fs_ht;
 		break;
 	}
-
+*/
+printk("dev->sda_hold_time======%d\n",dev->sda_hold_time);
 	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
 	if (id && id->driver_data)
 		dev->flags |= (u32)id->driver_data;
@@ -142,6 +143,8 @@ static int dw_i2c_acpi_configure(struct platform_device *pdev)
 	 * disable pm for it.
 	 */
 	uid = adev->pnp.unique_id;
+printk("uid===========%s\n",uid);
+
 	if ((dev->flags & MODEL_CHERRYTRAIL) && !strcmp(uid, "7"))
 		dev->pm_disabled = true;
 

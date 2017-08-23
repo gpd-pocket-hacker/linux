@@ -1,4 +1,4 @@
-/*
+ /*
  * Fuel gauge driver for Maxim 17042 / 8966 / 8997
  *  Note that Maxim 8966 and 8997 are mfd and this is its subdevice.
  *
@@ -986,7 +986,7 @@ static int max17042_probe(struct i2c_client *client,
 	int ret;
 	int i;
 	u32 val;
-
+printk("max17042_probe\n");
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_WORD_DATA))
 		return -EIO;
 
@@ -1116,7 +1116,8 @@ MODULE_DEVICE_TABLE(of, max17042_dt_match);
 
 static const struct i2c_device_id max17042_id[] = {
 	{ "max17042", MAXIM_DEVICE_TYPE_MAX17042 },
-	{ "max17047", MAXIM_DEVICE_TYPE_MAX17047 },
+	{ "MAX17047", MAXIM_DEVICE_TYPE_MAX17047 },
+{"MAX17047:00",MAXIM_DEVICE_TYPE_MAX17047},
 	{ "max17050", MAXIM_DEVICE_TYPE_MAX17050 },
 	{ }
 };

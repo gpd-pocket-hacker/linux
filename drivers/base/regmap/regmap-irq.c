@@ -437,7 +437,7 @@ int regmap_add_irq_chip(struct regmap *map, int irq, int irq_flags,
 	if (irq_base) {
 		irq_base = irq_alloc_descs(irq_base, 0, chip->num_irqs, 0);
 		if (irq_base < 0) {
-			dev_warn(map->dev, "Failed to allocate IRQs: %d\n",
+			dev_err(map->dev, "Failed to allocate IRQs: %d\n",
 				 irq_base);
 			return irq_base;
 		}

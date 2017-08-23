@@ -3198,6 +3198,7 @@ int rt5645_set_jack_detect(struct snd_soc_codec *codec,
 	struct snd_soc_jack *hp_jack, struct snd_soc_jack *mic_jack,
 	struct snd_soc_jack *btn_jack)
 {
+printk("rt5645_irq\n");
 	struct rt5645_priv *rt5645 = snd_soc_codec_get_drvdata(codec);
 
 	rt5645->hp_jack = hp_jack;
@@ -3221,10 +3222,10 @@ static void rt5645_jack_detect_work(struct work_struct *work)
 	struct rt5645_priv *rt5645 =
 		container_of(work, struct rt5645_priv, jack_detect_work.work);
 	int val, btn_type, gpio_state = 0, report = 0;
-
+printk("rt5645_jack_detect_work\n");
 	if (!rt5645->codec)
 		return;
-
+printk("rt5645->pdata.jd_mode=%d\n",rt5645->pdata.jd_mode);
 	switch (rt5645->pdata.jd_mode) {
 	case 0: /* Not using rt5645 JD */
 		if (rt5645->gpiod_hp_det) {
@@ -3242,20 +3243,21 @@ static void rt5645_jack_detect_work(struct work_struct *work)
 		val = snd_soc_read(rt5645->codec, RT5645_A_JD_CTRL1) & 0x0070;
 		break;
 	default: /* 1 port */
-		val = snd_soc_read(rt5645->codec, RT5645_A_JD_CTRL1) & 0x0020;
+		val = snd_soc_read(rt5645->codec, RT5645_INT_IRQ_ST) & 0x1000;
 		break;
 
 	}
 
-	switch (val) {
+	//switch (val) {
 	/* jack in */
-	case 0x30: /* 2 port */
-	case 0x0: /* 1 port or 2 port */
-		if (rt5645->jack_type == 0) {
+	//case 0x30: /* 2 port */
+	//case 0x0: /* 1 port or 2 port */
+		if ((!val)&&(rt5645->jack_type == 0)) {
 			report = rt5645_jack_detect(rt5645->codec, 1);
 			/* for push button and jack out */
-			break;
+			//break;
 		}
+else if(!val&&rt5645->jack_type!=0){
 		btn_type = 0;
 		if (snd_soc_read(rt5645->codec, RT5645_INT_IRQ_ST) & 0x4) {
 			/* button pressed */
@@ -3303,18 +3305,19 @@ static void rt5645_jack_detect_work(struct work_struct *work)
 				msecs_to_jiffies(100));
 		}
 
-		break;
+		//break;
+}else{
 	/* jack out */
-	case 0x70: /* 2 port */
-	case 0x10: /* 2 port */
-	case 0x20: /* 1 port */
+	//case 0x70: /* 2 port */
+	//case 0x10: /* 2 port */
+	//case 0x20: /* 1 port */
 		report = 0;
 		snd_soc_update_bits(rt5645->codec,
 				    RT5645_INT_IRQ_ST, 0x1, 0x0);
 		rt5645_jack_detect(rt5645->codec, 0);
-		break;
-	default:
-		break;
+	//	break;
+	//default:
+	//	break;
 	}
 
 	snd_soc_jack_report(rt5645->hp_jack, report, SND_JACK_HEADPHONE);
@@ -3337,7 +3340,7 @@ static void rt5645_rcclock_work(struct work_struct *work)
 static irqreturn_t rt5645_irq(int irq, void *data)
 {
 	struct rt5645_priv *rt5645 = data;
-
+printk("rt5645_irq\n");
 	queue_delayed_work(system_power_efficient_wq,
 			   &rt5645->jack_detect_work, msecs_to_jiffies(250));
 
@@ -3385,7 +3388,7 @@ static int rt5645_probe(struct snd_soc_codec *codec)
 		snd_soc_dapm_force_enable_pin(dapm, "JD Power");
 		snd_soc_dapm_force_enable_pin(dapm, "LDO2");
 		snd_soc_dapm_sync(dapm);
-	}
+	}//
 
 	rt5645->eq_param = devm_kzalloc(codec->dev,
 		RT5645_HWEQ_NUM * sizeof(struct rt5645_eq_param_s), GFP_KERNEL);
@@ -3562,7 +3565,10 @@ static const struct acpi_device_id rt5645_acpi_match[] = {
 };
 MODULE_DEVICE_TABLE(acpi, rt5645_acpi_match);
 #endif
-
+static struct rt5645_platform_data gdp_win_platform_data={
+.jd_mode=3,
+.inv_jd1_1=true,
+};
 static struct rt5645_platform_data general_platform_data = {
 	.dmic1_data_pin = RT5645_DMIC1_DISABLE,
 	.dmic2_data_pin = RT5645_DMIC_DATA_IN2P,
@@ -3584,8 +3590,7 @@ static const struct dmi_system_id dmi_platform_intel_braswell[] = {
 	},
 	{
 		.ident = "Google Setzer",
-		.matches = {
-			DMI_MATCH(DMI_PRODUCT_NAME, "Setzer"),
+		.matches = {DMI_MATCH(DMI_PRODUCT_NAME, "Setzer"),
 		},
 	},
 	{
@@ -3655,7 +3660,7 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 
 	rt5645->i2c = i2c;
 	i2c_set_clientdata(i2c, rt5645);
-
+/*
 	if (pdata)
 		rt5645->pdata = *pdata;
 	else if (dmi_check_system(dmi_platform_intel_broadwell))
@@ -3664,6 +3669,8 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 		rt5645_parse_dt(rt5645, &i2c->dev);
 	else if (dmi_check_system(dmi_platform_intel_braswell))
 		rt5645->pdata = general_platform_data;
+*/
+rt5645->pdata=gdp_win_platform_data;
 
 	rt5645->gpiod_hp_det = devm_gpiod_get_optional(&i2c->dev, "hp-detect",
 						       GPIOD_IN);
@@ -3848,6 +3855,11 @@ static int rt5645_i2c_probe(struct i2c_client *i2c,
 		default:
 			break;
 		}
+if(rt5645->pdata.inv_jd1_1){
+regmap_update_bits(rt5645->regmap, RT5645_IRQ_CTRL2,
+					   RT5645_JD_1_1_MASK,
+					   RT5645_JD_1_1_INV);
+}
 	}
 
 	regmap_update_bits(rt5645->regmap, RT5645_ADDA_CLK1,

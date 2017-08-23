@@ -1446,7 +1446,8 @@ static int i915_drm_suspend(struct drm_device *dev)
 	struct pci_dev *pdev = dev_priv->drm.pdev;
 	pci_power_t opregion_target_state;
 	int error;
-
+printk("i915_drm_suspend\n");
+//return;
 	/* ignore lid events during suspend */
 	mutex_lock(&dev_priv->modeset_restore_lock);
 	dev_priv->modeset_restore = MODESET_SUSPENDED;

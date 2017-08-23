@@ -232,14 +232,16 @@ static void goodix_ts_report_touch(struct goodix_ts_data *ts, u8 *coor_data)
 	int input_x = get_unaligned_le16(&coor_data[1]);
 	int input_y = get_unaligned_le16(&coor_data[3]);
 	int input_w = get_unaligned_le16(&coor_data[5]);
-
+printk("goodix_ts_report_touch input_x====%d,input_y====%d,max_x===%d,max_y===%d\n",input_x,input_y,ts->abs_x_max,ts->abs_y_max);
 	/* Inversions have to happen before axis swapping */
-	if (ts->inverted_x)
+if (ts->swapped_x_y)
+		swap(input_x, input_y);	
+if (ts->inverted_x)
 		input_x = ts->abs_x_max - input_x;
 	if (ts->inverted_y)
 		input_y = ts->abs_y_max - input_y;
-	if (ts->swapped_x_y)
-		swap(input_x, input_y);
+	//if (ts->swapped_x_y)
+	//	swap(input_x, input_y);
 
 	input_mt_slot(ts->input_dev, id);
 	input_mt_report_slot_state(ts->input_dev, MT_TOOL_FINGER, true);
@@ -636,12 +638,12 @@ static int goodix_configure_dev(struct goodix_ts_data *ts)
 {
 	int error;
 
-	ts->swapped_x_y = device_property_read_bool(&ts->client->dev,
-						    "touchscreen-swapped-x-y");
-	ts->inverted_x = device_property_read_bool(&ts->client->dev,
-						   "touchscreen-inverted-x");
-	ts->inverted_y = device_property_read_bool(&ts->client->dev,
-						   "touchscreen-inverted-y");
+	ts->swapped_x_y =true;// device_property_read_bool(&ts->client->dev,
+						//    "touchscreen-swapped-x-y");
+	ts->inverted_x =false;//rue;// device_property_read_bool(&ts->client->dev,
+						 //  "touchscreen-inverted-x");
+	ts->inverted_y =true;// device_property_read_bool(&ts->client->dev,
+						 //  "touchscreen-inverted-y");
 
 	goodix_read_config(ts);
 

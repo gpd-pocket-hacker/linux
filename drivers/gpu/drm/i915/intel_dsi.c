@@ -588,7 +588,7 @@ static void glk_dsi_disable_mipi_io(struct intel_encoder *encoder)
 }
 
 static void glk_dsi_clear_device_ready(struct intel_encoder *encoder)
-{
+{printk("glk_dsi_clear_device_reday\n");
 	glk_dsi_enter_low_power_mode(encoder);
 	glk_dsi_disable_mipi_io(encoder);
 }
@@ -598,7 +598,7 @@ static void vlv_dsi_clear_device_ready(struct intel_encoder *encoder)
 	struct drm_i915_private *dev_priv = to_i915(encoder->base.dev);
 	struct intel_dsi *intel_dsi = enc_to_intel_dsi(&encoder->base);
 	enum port port;
-
+printk("vlv_dsi_clear_device_ready\n");
 	DRM_DEBUG_KMS("\n");
 	for_each_dsi_port(port, intel_dsi->ports) {
 		/* Common bit for both MIPI Port A & MIPI Port C on VLV/CHV */
@@ -697,7 +697,7 @@ static void intel_dsi_port_disable(struct intel_encoder *encoder)
 	struct drm_i915_private *dev_priv = to_i915(dev);
 	struct intel_dsi *intel_dsi = enc_to_intel_dsi(&encoder->base);
 	enum port port;
-
+printk("intel_dis_port_disable\n");
 	for_each_dsi_port(port, intel_dsi->ports) {
 		i915_reg_t port_ctrl = IS_GEN9_LP(dev_priv) ?
 			BXT_MIPI_PORT_CTRL(port) : MIPI_PORT_CTRL(port);
@@ -864,7 +864,7 @@ static void intel_dsi_disable(struct intel_encoder *encoder,
 	enum port port;
 
 	DRM_DEBUG_KMS("\n");
-
+printk("intel_dsi_disable\n");
 	intel_dsi_vbt_exec_sequence(intel_dsi, MIPI_SEQ_BACKLIGHT_OFF);
 	intel_panel_disable_backlight(intel_dsi->attached_connector);
 

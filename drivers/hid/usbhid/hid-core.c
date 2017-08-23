@@ -1150,11 +1150,13 @@ static int usbhid_start(struct hid_device *hid)
 	 * In addition, enable remote wakeup by default for all keyboard
 	 * devices supporting the boot protocol.
 	 */
+printk("device_set_wakeup_enable\n");
 	if (interface->desc.bInterfaceSubClass == USB_INTERFACE_SUBCLASS_BOOT &&
 			interface->desc.bInterfaceProtocol ==
 				USB_INTERFACE_PROTOCOL_KEYBOARD) {
 		usbhid_set_leds(hid);
-		device_set_wakeup_enable(&dev->dev, 1);
+printk("device_set_wakeup_enable\n");
+		device_set_wakeup_enable(&dev->dev, 0);
 	}
 	return 0;
 
@@ -1282,7 +1284,7 @@ static int usbhid_probe(struct usb_interface *intf, const struct usb_device_id *
 
 	dbg_hid("HID probe called for ifnum %d\n",
 			intf->altsetting->desc.bInterfaceNumber);
-
+printk("usbhid_probe\n");
 	for (n = 0; n < interface->desc.bNumEndpoints; n++)
 		if (usb_endpoint_is_int_in(&interface->endpoint[n].desc))
 			has_in++;

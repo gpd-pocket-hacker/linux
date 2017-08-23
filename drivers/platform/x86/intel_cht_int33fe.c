@@ -42,7 +42,7 @@ static int cht_int33fe_probe(struct i2c_client *client)
 	unsigned long long ptyp;
 	acpi_status status;
 	int fusb302_irq;
-
+printk("cht_int33fe_probe\n");
 	status = acpi_evaluate_integer(ACPI_HANDLE(dev), "PTYP", NULL, &ptyp);
 	if (ACPI_FAILURE(status)) {
 		dev_err(dev, "Error getting PTYPE\n");
@@ -69,11 +69,13 @@ static int cht_int33fe_probe(struct i2c_client *client)
 		return -ENOMEM;
 
 	memset(&board_info, 0, sizeof(board_info));
-	strlcpy(board_info.type, "max17047", I2C_NAME_SIZE);
+	strlcpy(board_info.type, "MAX17047", I2C_NAME_SIZE);
 
 	data->max17047 = i2c_acpi_new_device(dev, 1, &board_info);
 	if (!data->max17047)
-		return -EPROBE_DEFER; /* Wait for the i2c-adapter to load */
+		 {
+printk("i2c_acpi_new_device\n");
+return -EPROBE_DEFER;} /* Wait for the i2c-adapter to load */
 
 	memset(&board_info, 0, sizeof(board_info));
 	strlcpy(board_info.type, "fusb302", I2C_NAME_SIZE);

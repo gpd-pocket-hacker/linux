@@ -2399,15 +2399,16 @@ static void set_usb_port_removable(struct usb_device *udev)
 int usb_new_device(struct usb_device *udev)
 {
 	int err;
-
+printk("usb_new_device\n");
 	if (udev->parent) {
 		/* Initialize non-root-hub device wakeup to disabled;
 		 * device (un)configuration controls wakeup capable
 		 * sysfs power/wakeup controls wakeup enabled/disabled
 		 */
+printk("usb_new_deviceffffffff\n");
 		device_init_wakeup(&udev->dev, 0);
 	}
-
+//device_init_wakeup(&udev->dev, 0);
 	/* Tell the runtime-PM framework the device is active */
 	pm_runtime_set_active(&udev->dev);
 	pm_runtime_get_noresume(&udev->dev);

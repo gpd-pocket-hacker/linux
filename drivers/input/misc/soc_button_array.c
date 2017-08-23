@@ -307,7 +307,7 @@ static int soc_button_probe(struct platform_device *pdev)
 	struct platform_device *pd;
 	int i;
 	int error;
-
+printk("soc_button_probe\n");
 	id = acpi_match_device(dev->driver->acpi_match_table, dev);
 	if (!id)
 		return -ENODEV;
