@@ -81,6 +81,9 @@ static const struct usb_device_id btusb_table[] = {
 	{ USB_VENDOR_AND_INTERFACE_INFO(0x05ac, 0xff, 0x01, 0x01),
 	  .driver_info = BTUSB_BCM_APPLE | BTUSB_IFNUM_2 },
 
+	/* GPD Pocket */
+	{ USB_DEVICE(0x0000, 0x0000) },
+
 	/* MediaTek MT76x0E */
 	{ USB_DEVICE(0x0e8d, 0x763f) },
 
