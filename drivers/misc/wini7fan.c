@@ -24,6 +24,9 @@ static struct acpi_device_id wini7fan_acpi_match[] = {
 	{ },
 };
 
+static unsigned int *gpd0con;  
+static unsigned int *gpd1con;  
+
 static int wini7fan_probe(struct platform_device *pdev)
 {	
 	/*
@@ -47,28 +50,62 @@ static int wini7fan_probe(struct platform_device *pdev)
 	gpiod_direction_output(gpiod, 1);
 	gpiod_direction_input(gpiod);
 	*/
-	static unsigned int *gpd0con;  
-	static unsigned int *gpd1con;  
+	printk(KERN_ERR "wini7fan start\n");
 	gpd0con = ioremap(GPIOFANADR1,4); 
 	gpd1con = ioremap(GPIOFANADR2,4);
-	writel(readl(gpd0con)+2,gpd0con);
-	writel(readl(gpd1con)+2,gpd1con);
+	writel(readl(gpd0con)|2,gpd0con);
+	writel(readl(gpd1con)|2,gpd1con);
 	return 0;
 	
 }
+
+
 
 static int wini7fan_remove(struct platform_device *pdev)
 {
 	return 0;
 }
 
+
+#ifdef CONFIG_PM_SLEEP
+
+static int wini7fan_suspend(struct device *dev)
+{
+printk(KERN_ERR "wini7fan suspend\n");
+if (gpd0con)
+	writel(readl(gpd0con)&~0x2UL,gpd0con);
+if (gpd1con)
+	writel(readl(gpd0con)&~0x2UL,gpd1con);
+
+return 0;
+}
+
+static int wini7fan_resume(struct device *dev)
+{
+printk(KERN_ERR "wini7fan resume\n");
+if (gpd0con)
+	writel(readl(gpd0con)|2,gpd0con);
+if (gpd1con)
+	writel(readl(gpd0con)|2,gpd1con);
+
+return 0;
+}
+
+#endif
+
+static SIMPLE_DEV_PM_OPS(wini7fan_pm_ops, wini7fan_suspend,wini7fan_resume);
+
+
 MODULE_DEVICE_TABLE(acpi, wini7fan_acpi_match);
 static struct platform_driver wini7fan_driver = {
 	.probe		= wini7fan_probe,
 	.remove		= wini7fan_remove,
+	.suspend	= wini7fan_suspend,
+	.resume		= wini7fan_resume,
 	.driver	= {
 		.name	= "FAN0",
 		.acpi_match_table = ACPI_PTR(wini7fan_acpi_match),
+                .pm     = &wini7fan_pm_ops,
 	},
 };
 
